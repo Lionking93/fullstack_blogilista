@@ -1,0 +1,9 @@
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+
+{
+  "title": "Node on jännää",
+  "author": "Jaska Jokunen",
+  "url": "http://joku-url-vaan.com",
+  "likes": 2
+}

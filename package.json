@@ -1,0 +1,18 @@
+{
+  "name": "fullstack_blogilista",
+  "version": "1.0.0",
+  "description": "Blogilista node app HY:n fullstack-kurssille",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Leo Kallonen",
+  "license": "MIT",
+  "devDependencies": {
+    "nodemon": "^1.18.9"
+  },
+  "dependencies": {
+    "dotenv": "^6.2.0"
+  }
+}

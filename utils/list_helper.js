@@ -22,6 +22,7 @@ const favoriteBlog = (blogs) => {
     : {}
 }
 
+
 const blogCountForEachBlogger = (blogs) => {
   if (!blogs) {
     return {}
@@ -42,7 +43,27 @@ const blogCountForEachBlogger = (blogs) => {
   return bloggersWithBlogCount
 }
 
-const mostBlogs = (blogs) => {
+const likeCountForEachBlogger = (blogs) => {
+  if (!blogs) {
+    return {}
+  }
+
+  const bloggersWithLikeCount = {}
+
+  if (blogs.length > 0) {
+    blogs.forEach((blog) => {
+      if (!bloggersWithLikeCount.hasOwnProperty(blog.author)) {
+        bloggersWithLikeCount[blog.author] = blog.likes
+      } else {
+        bloggersWithLikeCount[blog.author] += blog.likes
+      }
+    })
+  }
+
+  return bloggersWithLikeCount
+}
+
+const getMostForAuthor = (blogs, mostFunction, mostOfWhat) => {
   if (!blogs) {
     return {}
   }
@@ -51,28 +72,36 @@ const mostBlogs = (blogs) => {
     return {}
   }
 
-  const bloggersWithBlogCount = blogCountForEachBlogger(blogs)
+  const bloggersWithCount = mostFunction(blogs)
 
-  const bloggerWithMostBlogs = Object
-    .keys(bloggersWithBlogCount)
-    .reduce((bloggerWithMostBlogs, blogger) => {
-      const highestBlogCount = Object.values(bloggerWithMostBlogs)[0]
-      const blogCount = bloggersWithBlogCount[blogger]
+  const bloggerWithMost = Object
+    .keys(bloggersWithCount)
+    .reduce((bloggerWithMost, blogger) => {
+      const highestCount = Object.values(bloggerWithMost)[0]
+      const count = bloggersWithCount[blogger]
 
-      return highestBlogCount > blogCount
-        ? bloggerWithMostBlogs
+      return highestCount > count
+        ? bloggerWithMost
         : {
-          [blogger]: blogCount
+          [blogger]: count
         }
     },
     {
-      [Object.keys(bloggersWithBlogCount)[0]]: bloggersWithBlogCount[Object.keys(bloggersWithBlogCount)[0]]
+      [Object.keys(bloggersWithCount)[0]]: bloggersWithCount[Object.keys(bloggersWithCount)[0]]
     })
 
   return {
-    author: Object.keys(bloggerWithMostBlogs)[0],
-    blogs: bloggerWithMostBlogs[Object.keys(bloggerWithMostBlogs)[0]]
+    author: Object.keys(bloggerWithMost)[0],
+    [mostOfWhat]: bloggerWithMost[Object.keys(bloggerWithMost)[0]]
   }
+}
+
+const mostBlogs = (blogs) => {
+  return getMostForAuthor(blogs, blogCountForEachBlogger, 'blogs')
+}
+
+const mostLikes = (blogs) => {
+  return getMostForAuthor(blogs, likeCountForEachBlogger, 'likes')
 }
 
 module.exports = {
@@ -80,5 +109,7 @@ module.exports = {
   totalLikes,
   favoriteBlog,
   blogCountForEachBlogger,
-  mostBlogs
+  mostBlogs,
+  likeCountForEachBlogger,
+  mostLikes
 }

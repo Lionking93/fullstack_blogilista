@@ -105,6 +105,25 @@ test('blog can be added to blog list properly', async () => {
   expect(blogs[blogs.length - 1].title).toContain('Node on jännää')
 })
 
+test('blog that is added without likes set will have likes value 0', async () => {
+  const newBlog = {
+    title: 'Tästä blogista ei tykkää kukaan',
+    author: 'Blogiheebo',
+    url: 'http://blog.blogblog.blog'
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  const response = await api.get('/api/blogs')
+  const lastBlog = response.body[response.body.length - 1]
+
+  expect(lastBlog.likes).toBe(0)
+})
+
 afterAll(() => {
   mongoose.connection.close()
 })

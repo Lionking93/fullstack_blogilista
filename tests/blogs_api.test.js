@@ -124,6 +124,32 @@ test('blog that is added without likes set will have likes value 0', async () =>
   expect(lastBlog.likes).toBe(0)
 })
 
+test('adding blog without title results in 400 Bad request', async () => {
+  const newBlog = {
+    author: 'Blogiheebo',
+    url: 'http://blog.blog',
+    likes: 1
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
+})
+
+test('adding blog without url results in 400 Bad request', async () => {
+  const newBlog = {
+    title: 'blogi ilman urlia',
+    author: 'Blogiheebo',
+    likes: 1
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
+})
+
 afterAll(() => {
   mongoose.connection.close()
 })

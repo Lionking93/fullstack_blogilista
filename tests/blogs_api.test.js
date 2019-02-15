@@ -83,71 +83,107 @@ test('blogs are identified by field id', async () => {
   }
 })
 
-test('blog can be added to blog list properly', async () => {
-  const newBlog = {
-    title: 'Node on jännää',
-    author: 'Jokusen Jaska',
-    url: 'http://nettisivu.test',
-    likes: 2
-  }
+describe('adding blog', async () => {
+  test('is possible', async () => {
+    const newBlog = {
+      title: 'Node on jännää',
+      author: 'Jokusen Jaska',
+      url: 'http://nettisivu.test',
+      likes: 2
+    }
 
-  await api
-    .post('/api/blogs')
-    .send(newBlog)
-    .expect(201)
-    .expect('Content-Type', /application\/json/)
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
 
-  const response = await api.get('/api/blogs')
-  const blogs = response.body
+    const response = await api.get('/api/blogs')
+    const blogs = response.body
 
-  expect(blogs.length).toBe(7)
+    expect(blogs.length).toBe(7)
 
-  expect(blogs[blogs.length - 1].title).toContain('Node on jännää')
+    expect(blogs[blogs.length - 1].title).toContain('Node on jännää')
+  })
+
+  test('without likes set will have likes value 0', async () => {
+    const newBlog = {
+      title: 'Tästä blogista ei tykkää kukaan',
+      author: 'Blogiheebo',
+      url: 'http://blog.blogblog.blog'
+    }
+
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+
+    const response = await api.get('/api/blogs')
+    const lastBlog = response.body[response.body.length - 1]
+
+    expect(lastBlog.likes).toBe(0)
+  })
+
+  test('without title results in 400 Bad request', async () => {
+    const newBlog = {
+      author: 'Blogiheebo',
+      url: 'http://blog.blog',
+      likes: 1
+    }
+
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(400)
+  })
+
+  test('without url results in 400 Bad request', async () => {
+    const newBlog = {
+      title: 'blogi ilman urlia',
+      author: 'Blogiheebo',
+      likes: 1
+    }
+
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(400)
+  })
 })
 
-test('blog that is added without likes set will have likes value 0', async () => {
-  const newBlog = {
-    title: 'Tästä blogista ei tykkää kukaan',
-    author: 'Blogiheebo',
-    url: 'http://blog.blogblog.blog'
-  }
+describe('deleting blog', async () => {
+  test('can be done', async () => {
+    const response = await api.get('/api/blogs')
+    const blogToBeDeleted = response.body[0]
 
-  await api
-    .post('/api/blogs')
-    .send(newBlog)
-    .expect(201)
-    .expect('Content-Type', /application\/json/)
+    await api
+      .delete(`/api/blogs/${blogToBeDeleted.id}`)
+      .expect(204)
 
-  const response = await api.get('/api/blogs')
-  const lastBlog = response.body[response.body.length - 1]
+    const responseAfterDelete = await api.get('/api/blogs')
+    const blogsAfterDelete = responseAfterDelete.body
 
-  expect(lastBlog.likes).toBe(0)
+    expect(blogsAfterDelete.length).toEqual(response.body.length - 1)
+
+    expect(blogsAfterDelete[0].title).not.toBe('React patterns')
+  })
 })
 
-test('adding blog without title results in 400 Bad request', async () => {
-  const newBlog = {
-    author: 'Blogiheebo',
-    url: 'http://blog.blog',
-    likes: 1
-  }
+describe('updating blog', async () => {
+  test('by setting new value for likes succeeds', async() => {
+    const response = await api.get('/api/blogs')
+    const blogToBeUpdated = response.body[0]
 
-  await api
-    .post('/api/blogs')
-    .send(newBlog)
-    .expect(400)
-})
+    const blogWithUpdate = { ...blogToBeUpdated, likes: 1 }
 
-test('adding blog without url results in 400 Bad request', async () => {
-  const newBlog = {
-    title: 'blogi ilman urlia',
-    author: 'Blogiheebo',
-    likes: 1
-  }
+    const updateResponse = await api
+      .put(`/api/blogs/${blogToBeUpdated.id}`)
+      .send(blogWithUpdate)
+      .expect(200)
 
-  await api
-    .post('/api/blogs')
-    .send(newBlog)
-    .expect(400)
+    expect(updateResponse.body.likes).toBe(1)
+  })
 })
 
 afterAll(() => {

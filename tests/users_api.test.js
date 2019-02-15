@@ -70,7 +70,7 @@ describe('cannot add user', async() => {
       .send(newUser)
       .expect(400)
 
-    expect(response.body.error).toContain('`username` to be unique')
+    expect(response.body.error).toContain('expected `username` to be unique')
   })
 
   test('with less than 3 chars in username', async () => {
@@ -81,7 +81,7 @@ describe('cannot add user', async() => {
       .send(newUser)
       .expect(400)
 
-    expect(response.body.error).toContain('minimum allowed length (3).')
+    expect(response.body.error).toContain('shorter than the minimum allowed length (3).')
   })
 
   test('without username', async () => {

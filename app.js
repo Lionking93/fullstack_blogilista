@@ -6,7 +6,8 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 const mongoose = require('mongoose')
 
-const mongoUrl = config.MONGODB_URI
+const mongoUrl = config.mongoUrl
+console.log(mongoUrl)
 mongoose.connect(mongoUrl, { useNewUrlParser: true })
 
 app.use(cors())

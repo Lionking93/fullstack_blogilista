@@ -83,6 +83,28 @@ test('blogs are identified by field id', async () => {
   }
 })
 
+test('blog can be added to blog list properly', async () => {
+  const newBlog = {
+    title: 'Node on jännää',
+    author: 'Jokusen Jaska',
+    url: 'http://nettisivu.test',
+    likes: 2
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  const response = await api.get('/api/blogs')
+  const blogs = response.body
+
+  expect(blogs.length).toBe(7)
+
+  expect(blogs[blogs.length - 1].title).toContain('Node on jännää')
+})
+
 afterAll(() => {
   mongoose.connection.close()
 })
